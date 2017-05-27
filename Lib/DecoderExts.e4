@@ -1,0 +1,25 @@
+--changequote(<!,!>)
+--include(<!RelmMacros.e4!>)
+module RELM.Lib.DecoderExts exposing(..)
+-- Probably reusable extentions out side the project
+
+import Date exposing(..)
+IMPORT_JSON_DECODE
+
+customDecoder decoder toResult =
+   Decode.andThen
+             (\a ->
+                   case toResult a of
+                      Ok b -> Decode.succeed b
+                      Err err -> Decode.fail err
+             )
+             decoder
+
+decodeDate =
+  customDecoder Decode.string Date.fromString
+
+decodeNullOr decoder =
+  Decode.oneOf
+    [ Decode.null Nothing
+    , Decode.map Just decoder
+    ]
